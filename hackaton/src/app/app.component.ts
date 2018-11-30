@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'hackaton';
+  locations = [{ geoPoint: {latitude: 45, longitude: -74} }];
 }
