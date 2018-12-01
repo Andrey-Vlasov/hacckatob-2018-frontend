@@ -3,9 +3,13 @@ import { ExternalJsFileLoader } from './external-js-file-loader.service';
 import { Injectable } from '@angular/core';
 
 const GOOGLE_MAP_API_URL = 'https://maps.googleapis.com/maps/api/js';
-const GOOGLE_API_KEY = ''; // past the key here
-const DEFAULT_SCALE = 12;
+const GOOGLE_API_KEY = 'AIzaSyB7KXTrhIgBrBMNNVHWVWVyHfWcV_2Qe0Q'; // past the key here
+const DEFAULT_SCALE = 4;
 const SELECTED_MARKER_SCALE = 16;
+const censusMax = -Number.MAX_VALUE;
+const censusMin = Number.MAX_VALUE;
+
+const colors = [0, 255 , 0];
 
 @Injectable()
 export class GoogleMapRendererService {
@@ -69,20 +73,50 @@ export class GoogleMapRendererService {
    */
   private defineMapCenter(locations: any[]): google.maps.LatLng {
     return new google.maps.LatLng(
-      locations[0].geoPoint.latitude,
-      locations[0].geoPoint.longitude);
+      40,
+      -100);
   }
 
   private initMap(
     mapElement: HTMLElement,
     mapCenter: google.maps.LatLng
   ): void {
+    let complexStyle1: google.maps.MapTypeStyle;
+    complexStyle1 = {
+      stylers: [{visibility: 'off', color: '#fcfcfc'}],
+      featureType: 'landscape',
+      elementType: 'geometry'
+    };
+
+    let complexStyle2: google.maps.MapTypeStyle;
+    complexStyle2 = {
+      stylers: [{visibility: 'off', color: '#bfd4ff'}],
+      featureType: 'water',
+      elementType: 'geometry'
+    };
+
     const mapProp = {
       center: mapCenter,
-      zoom: DEFAULT_SCALE,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      zoom: DEFAULT_SCALE
     };
+
     this.googleMap = new google.maps.Map(mapElement, mapProp);
+    this.googleMap.data.loadGeoJson('https://raw.githubusercontent.com/mapbox/geojson-vt-cpp/master/data/countries.geojson', { idPropertyName: 'STATE' });
+    this.googleMap.data.setStyle((feature) => {
+
+      colors[0] += 5;
+      colors[1] -= 5;
+
+     return {
+     fillColor: 'RGB(' + colors[0] + ',' + colors[1] + ',' + colors[2] + ')',
+     strokeColor: 'RGB(' + colors[0] + ',' + colors[1] + ',' + colors[2] + ')',
+     strokeWeight: 0,
+     // draggable: true,
+     fillOpacity: 0.5
+    };
+  });
+
+    console.log(this.googleMap);
   }
 
   /**
