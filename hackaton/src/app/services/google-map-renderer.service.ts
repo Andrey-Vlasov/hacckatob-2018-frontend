@@ -1,6 +1,9 @@
 /// <reference types="@types/googlemaps" />
 import { ExternalJsFileLoader } from './external-js-file-loader.service';
 import { Injectable } from '@angular/core';
+import { HybrisOccService } from './hybris-occ.service';
+import { LinearColorGradient } from './linear-color-gradient.service';
+import { Color } from '../models/color';
 
 const GOOGLE_MAP_API_URL = 'https://maps.googleapis.com/maps/api/js';
 const GOOGLE_API_KEY = 'AIzaSyB7KXTrhIgBrBMNNVHWVWVyHfWcV_2Qe0Q'; // past the key here
@@ -17,9 +20,15 @@ const colors = [0, 255 , 0];
 export class GoogleMapRendererService {
   private googleMap: google.maps.Map = null;
   private markers: google.maps.Marker[];
+  private countries;
+
+  private minimumDon;
+  private maximumDon;
 
   constructor(
-    private externalJsFileLoader: ExternalJsFileLoader
+    private externalJsFileLoader: ExternalJsFileLoader,
+    private hybrisOccService: HybrisOccService,
+    private linearColorGradient: LinearColorGradient
   ) {}
 
   /**
@@ -78,14 +87,15 @@ export class GoogleMapRendererService {
       DEFAULT_LONGITUDE);
   }
 
-  private initMap(
+  private async initMap(
     mapElement: HTMLElement,
     mapCenter: google.maps.LatLng,
     geoDataUrl: string
-  ): void {
+  ) {
     const mapProp = {
       center: mapCenter,
-      zoom: DEFAULT_SCALE
+      zoom: DEFAULT_SCALE,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
     this.googleMap = new google.maps.Map(mapElement, mapProp);
@@ -94,28 +104,34 @@ export class GoogleMapRendererService {
       this.googleMap.data.loadGeoJson(geoDataUrl);
     }
 
-    const countries = {
-      'US': 100,
-      'CA': 100
-    };
+    const countries = this.hybrisOccService.getDonationData();
+
+    await countries.subscribe(resp => this.countries = resp);
+
+    this.findMinimumMaximumValues(this.countries);
+
     this.googleMap.data.setStyle((feature) => {
-      console.log(feature.m);
-      colors[0] += 5;
-      colors[1] -= 5;
+      const anyFeature: any = feature;
+      const donation = getCountryISO2(anyFeature.m);
+
+      let color: Color;
+      if (donation) {
+      color = this.linearColorGradient.getColorsForGivenIntencity(this.minimumDon,
+        this.maximumDon,
+        this.countries[getCountryISO2(anyFeature.m)]);
+      } else {
+        return {
+          visible: false
+        };
+      }
 
      return {
-     // fillColor: 'RGB(' + colors[0] + ',' + colors[1] + ',' + colors[2] + ')',
-     fillColor: 'RGB(0,127,0)',
-     // strokeColor: 'RGB(' + colors[0] + ',' + colors[1] + ',' + colors[2] + ')',
+     fillColor: 'RGB(' + color.red + ',' + color.green + ',' + color.blue + ')',
      strokeWeight: 0,
      // draggable: true,
-     fillOpacity: countries[getCountryISO2(feature.m)] ? 0.5 : 0
+     fillOpacity: color.opac
     };
   });
-
-    let hui: any;
-    hui = this.googleMap.data;
-    console.log(this.googleMap.data.get('AFG'));
   }
 
   /**
@@ -154,5 +170,19 @@ export class GoogleMapRendererService {
 
   private setMapOnAllMarkers(map: google.maps.Map): void {
     this.markers.forEach(marker => marker.setMap(map));
+  }
+
+  private findMinimumMaximumValues(countries) {
+    this.minimumDon = Number.MAX_VALUE;
+    this.maximumDon = Number.MIN_VALUE;
+
+    Object.keys(countries).forEach((key) => {
+      if (countries[key] > this.maximumDon) {
+        this.maximumDon = countries[key];
+      }
+      if (countries[key] < this.minimumDon) {
+        this.minimumDon = countries[key];
+      }
+    });
   }
 }
