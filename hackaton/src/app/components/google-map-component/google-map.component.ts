@@ -6,7 +6,8 @@ import {
   OnChanges,
   SimpleChanges,
   Output,
-  EventEmitter
+  EventEmitter,
+  OnInit
 } from '@angular/core';
 import { GoogleMapRendererService } from '../../services/google-map-renderer.service';
 
@@ -16,26 +17,34 @@ import { GoogleMapRendererService } from '../../services/google-map-renderer.ser
   template: '<div #mapElement class="map"></div>',
   styleUrls: ['./google-map.component.scss']
 })
-export class GoogleMapComponent implements OnChanges {
+export class GoogleMapComponent implements OnChanges, OnInit {
   @ViewChild('mapElement')
   mapElement: ElementRef;
   @Input()
-  locations: any[];
+  locations: any[] = [];
+  @Input()
+  geoDataUrl: string;
   @Output()
   selectedStoreItem: EventEmitter<number> = new EventEmitter();
 
   constructor(private googleMapRendererService: GoogleMapRendererService) {}
 
+  ngOnInit(): void {
+    this.ngOnChanges(null);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.locations && this.locations) {
+   // if (changes.locations && this.locations) {
+     console.log('google map component onChanges');
       this.googleMapRendererService.renderMap(
         this.mapElement.nativeElement,
         this.locations,
         markerIndex => {
           this.selectStoreItemClickHandle(markerIndex);
-        }
+        },
+        this.geoDataUrl
       );
-    }
+   // }
   }
 
   /**

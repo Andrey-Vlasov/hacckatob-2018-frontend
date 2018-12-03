@@ -4,10 +4,12 @@ import { Injectable } from '@angular/core';
 
 const GOOGLE_MAP_API_URL = 'https://maps.googleapis.com/maps/api/js';
 const GOOGLE_API_KEY = 'AIzaSyB7KXTrhIgBrBMNNVHWVWVyHfWcV_2Qe0Q'; // past the key here
-const DEFAULT_SCALE = 4;
+const DEFAULT_SCALE = 2;
 const SELECTED_MARKER_SCALE = 16;
-const censusMax = -Number.MAX_VALUE;
-const censusMin = Number.MAX_VALUE;
+const DEFAULT_LATITUDE = 30;
+const DEFAULT_LONGITUDE = 0;
+
+const getCountryISO2 = require('country-iso-3-to-2');
 
 const colors = [0, 255 , 0];
 
@@ -30,17 +32,16 @@ export class GoogleMapRendererService {
   renderMap(
     mapElement: HTMLElement,
     locations: any[],
-    selectMarkerHandler?: Function
+    selectMarkerHandler?: Function,
+    geoDataUrl?: string
   ): void {
     if (this.googleMap === null) {
           this.externalJsFileLoader.load(
             GOOGLE_MAP_API_URL,
             { key: GOOGLE_API_KEY },
             () => {
-              this.initMap(mapElement, this.defineMapCenter(locations));
-              if (selectMarkerHandler) {
-                this.createMarkers(locations, selectMarkerHandler);
-              } else {
+              this.initMap(mapElement, this.defineMapCenter(locations), geoDataUrl);
+              if (locations.length !== 0) {
                 this.createMarkers(locations);
               }
             }
@@ -73,50 +74,48 @@ export class GoogleMapRendererService {
    */
   private defineMapCenter(locations: any[]): google.maps.LatLng {
     return new google.maps.LatLng(
-      40,
-      -100);
+      DEFAULT_LATITUDE,
+      DEFAULT_LONGITUDE);
   }
 
   private initMap(
     mapElement: HTMLElement,
-    mapCenter: google.maps.LatLng
+    mapCenter: google.maps.LatLng,
+    geoDataUrl: string
   ): void {
-    let complexStyle1: google.maps.MapTypeStyle;
-    complexStyle1 = {
-      stylers: [{visibility: 'off', color: '#fcfcfc'}],
-      featureType: 'landscape',
-      elementType: 'geometry'
-    };
-
-    let complexStyle2: google.maps.MapTypeStyle;
-    complexStyle2 = {
-      stylers: [{visibility: 'off', color: '#bfd4ff'}],
-      featureType: 'water',
-      elementType: 'geometry'
-    };
-
     const mapProp = {
       center: mapCenter,
       zoom: DEFAULT_SCALE
     };
 
     this.googleMap = new google.maps.Map(mapElement, mapProp);
-    this.googleMap.data.loadGeoJson('https://raw.githubusercontent.com/mapbox/geojson-vt-cpp/master/data/countries.geojson', { idPropertyName: 'STATE' });
-    this.googleMap.data.setStyle((feature) => {
 
+    if (geoDataUrl) {
+      this.googleMap.data.loadGeoJson(geoDataUrl);
+    }
+
+    const countries = {
+      'US': 100,
+      'CA': 100
+    };
+    this.googleMap.data.setStyle((feature) => {
+      console.log(feature.m);
       colors[0] += 5;
       colors[1] -= 5;
 
      return {
-     fillColor: 'RGB(' + colors[0] + ',' + colors[1] + ',' + colors[2] + ')',
-     strokeColor: 'RGB(' + colors[0] + ',' + colors[1] + ',' + colors[2] + ')',
+     // fillColor: 'RGB(' + colors[0] + ',' + colors[1] + ',' + colors[2] + ')',
+     fillColor: 'RGB(0,127,0)',
+     // strokeColor: 'RGB(' + colors[0] + ',' + colors[1] + ',' + colors[2] + ')',
      strokeWeight: 0,
      // draggable: true,
-     fillOpacity: 0.5
+     fillOpacity: countries[getCountryISO2(feature.m)] ? 0.5 : 0
     };
   });
 
-    console.log(this.googleMap);
+    let hui: any;
+    hui = this.googleMap.data;
+    console.log(this.googleMap.data.get('AFG'));
   }
 
   /**
