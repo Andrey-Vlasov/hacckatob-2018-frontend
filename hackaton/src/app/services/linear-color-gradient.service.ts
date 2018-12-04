@@ -2,8 +2,8 @@ import { ColorGradient } from '../models/ColorGradient';
 import { Color } from '../models/color';
 import { Injectable } from '@angular/core';
 
-const defaultValues = [[200, 200],
-                        [200, 0],
+const defaultValues = [[0, 0],
+                        [200, 200],
                         [0, 0],
                         [0.4, 0.8]];
 
@@ -12,6 +12,7 @@ export class LinearColorGradient {
    allComponents = defaultValues;
 
     public getColorsForGivenIntencity(minValue: number, maxValue: number, currentValue: number): Color {
+        console.log(minValue, maxValue, currentValue);
         if (minValue === maxValue) {
             minValue *= 0.01;
         }

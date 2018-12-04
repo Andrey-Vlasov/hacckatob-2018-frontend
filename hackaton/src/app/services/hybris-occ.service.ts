@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 export class HybrisOccService {
     constructor(private http: HttpClient) {}
     getDonationData(): Observable<any> {
-        return this.http.get('https://donation-map-stage.sa-hackathon-08.cluster.extend.sap.cx/');
+        // return this.http.get('https://donation-map-stage.sa-hackathon-08.cluster.extend.sap.cx/');
         return of({'US': 100,
         'CA': 50,
         'RU': 50,

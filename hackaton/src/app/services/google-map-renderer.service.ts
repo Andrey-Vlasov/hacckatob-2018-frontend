@@ -5,8 +5,9 @@ import { HybrisOccService } from './hybris-occ.service';
 import { LinearColorGradient } from './linear-color-gradient.service';
 import { Color } from '../models/color';
 
-const GOOGLE_MAP_API_URL = 'https://maps.googleapis.com/maps/api/js';
-const GOOGLE_API_KEY = 'AIzaSyB7KXTrhIgBrBMNNVHWVWVyHfWcV_2Qe0Q'; // past the key here
+const GOOGLE_MAP_API_URL = '';
+// const GOOGLE_API_KEY = ''; // past the key here
+const GOOGLE_API_KEY = 'AIzaSyDGMNEuMeZWr5OZHJ8E8TQkugKCF-moVxo';
 const DEFAULT_SCALE = 2;
 const SELECTED_MARKER_SCALE = 16;
 const DEFAULT_LATITUDE = 30;
@@ -92,21 +93,56 @@ export class GoogleMapRendererService {
     mapCenter: google.maps.LatLng,
     geoDataUrl: string
   ) {
+
+    let mapOpt: google.maps.MapTypeStyle[];
+
+    mapOpt = [{
+      featureType: 'administrative.country',
+      elementType: 'labels',
+      stylers: [{visibility: 'off'}]
+    },
+      {
+        featureType: 'water',
+      elementType: 'labels',
+      stylers: [{visibility: 'off'}]
+      },
+      {
+        featureType: 'landscape',
+      elementType: 'all',
+      stylers: [{visibility: 'off'}]
+      },
+      {
+        featureType: 'administrative.province',
+      elementType: 'all',
+      stylers: [{visibility: 'off'}]
+      }];
+
     const mapProp = {
       center: mapCenter,
       zoom: DEFAULT_SCALE,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      fullscreenControl: false,
+      draggable: false,
+      zoomControl: false,
+      styles: mapOpt,
+      streetViewControl: false,
+      mapTypeControl: false
     };
 
     const label = document.createElement('div');
     label.id = 'data-label';
     document.body.appendChild(label);
 
+
     this.googleMap = new google.maps.Map(mapElement, mapProp);
 
     if (geoDataUrl) {
       this.googleMap.data.loadGeoJson(geoDataUrl);
     }
+
+    this.googleMap.data.add({geometry: new google.maps.Data.Polygon([[{lat: 0, lng: 0},
+      {lat: 40, lng: 40},
+      {lat: -40, lng: 40}]])});
 
     const countries = this.hybrisOccService.getDonationData();
 
@@ -129,8 +165,7 @@ export class GoogleMapRendererService {
       }
 
       let color: Color;
-      console.log(donation);
-      if (donation) {
+      if (donation && !isNaN(donation)) {
       color = this.linearColorGradient.getColorsForGivenIntencity(this.minimumDon,
         this.maximumDon,
         donation);
@@ -140,13 +175,15 @@ export class GoogleMapRendererService {
         };
       }
 
+      console.log(color);
      return {
      fillColor: 'RGB(' + color.red + ',' + color.green + ',' + color.blue + ')',
      strokeWeight: outLineweight,
      // draggable: true,
      fillOpacity: color.opac,
      // zIndex: zindex
-     visible: true
+     visible: true,
+     zIndex: -1
     };
   });
 
@@ -158,7 +195,6 @@ export class GoogleMapRendererService {
   });
 
   this.googleMap.data.addListener('mouseout', (e) => {
-    console.log('hui');
     e.feature.setProperty('state', 'ok');
   });
   }
@@ -206,10 +242,10 @@ export class GoogleMapRendererService {
     this.maximumDon = Number.MIN_VALUE;
 
     Object.keys(countries).forEach((key) => {
-      if (countries[key] > this.maximumDon) {
+      if (countries[key] > this.maximumDon && !isNaN(countries[key])) {
         this.maximumDon = countries[key];
       }
-      if (countries[key] < this.minimumDon) {
+      if (countries[key] < this.minimumDon && !isNaN(countries[key])) {
         this.minimumDon = countries[key];
       }
     });
