@@ -8,11 +8,13 @@ import { ExternalJsFileLoader } from './services/external-js-file-loader.service
 import { HybrisOccService } from './services/hybris-occ.service';
 import { LinearColorGradient } from './services/linear-color-gradient.service';
 import { HttpClientModule } from '@angular/common/http';
+import { GoogleChartComponent } from './components/google-chart-component/google-chart.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GoogleMapComponent
+    GoogleMapComponent,
+    GoogleChartComponent
   ],
   imports: [
     BrowserModule,
