@@ -110,7 +110,7 @@ export class GoogleMapRendererService {
 
     const countries = this.hybrisOccService.getDonationData();
 
-    await countries.subscribe(resp => this.countries = resp);
+    await countries.toPromise().then(resp => {console.log(resp); this.countries = resp; });
 
     this.findMinimumMaximumValues(this.countries);
 

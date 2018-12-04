@@ -7,6 +7,7 @@ import { GoogleMapRendererService } from './services/google-map-renderer.service
 import { ExternalJsFileLoader } from './services/external-js-file-loader.service';
 import { HybrisOccService } from './services/hybris-occ.service';
 import { LinearColorGradient } from './services/linear-color-gradient.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { LinearColorGradient } from './services/linear-color-gradient.service';
     GoogleMapComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpClientModule
   ],
   providers: [GoogleMapRendererService, ExternalJsFileLoader, HybrisOccService, LinearColorGradient],
   bootstrap: [AppComponent]
