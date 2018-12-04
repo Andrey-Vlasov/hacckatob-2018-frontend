@@ -1,4 +1,3 @@
-import { ColorGradient } from '../models/ColorGradient';
 import { Color } from '../models/color';
 import { Injectable } from '@angular/core';
 
