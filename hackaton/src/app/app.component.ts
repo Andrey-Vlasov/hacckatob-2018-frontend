@@ -6,6 +6,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'hackaton';
+  title = 'Kyma hackaton';
   locations = [{ geoPoint: {latitude: 45, longitude: -74} }];
 }
