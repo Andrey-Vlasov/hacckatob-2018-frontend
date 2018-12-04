@@ -2,10 +2,10 @@ import { ColorGradient } from '../models/ColorGradient';
 import { Color } from '../models/color';
 import { Injectable } from '@angular/core';
 
-const defaultValues = [[0, 0],
-                        [220, 170],
+const defaultValues = [[200, 200],
+                        [200, 0],
                         [0, 0],
-                        [0, 0.8]];
+                        [0.4, 0.8]];
 
 @Injectable()
 export class LinearColorGradient {

@@ -98,6 +98,10 @@ export class GoogleMapRendererService {
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
+    const label = document.createElement('div');
+    label.id = 'data-label';
+    document.body.appendChild(label);
+
     this.googleMap = new google.maps.Map(mapElement, mapProp);
 
     if (geoDataUrl) {
@@ -112,13 +116,24 @@ export class GoogleMapRendererService {
 
     this.googleMap.data.setStyle((feature) => {
       const anyFeature: any = feature;
-      const donation = getCountryISO2(anyFeature.m);
+      const donation = this.countries[getCountryISO2(anyFeature.m)];
+
+      let outLineweight: number;
+      let zindex: number;
+      if (feature.getProperty('state') === 'hover') {
+        outLineweight = 2;
+        zindex = 2;
+      } else {
+        outLineweight = 0;
+        zindex = 1;
+      }
 
       let color: Color;
+      console.log(donation);
       if (donation) {
       color = this.linearColorGradient.getColorsForGivenIntencity(this.minimumDon,
         this.maximumDon,
-        this.countries[getCountryISO2(anyFeature.m)]);
+        donation);
       } else {
         return {
           visible: false
@@ -127,10 +142,24 @@ export class GoogleMapRendererService {
 
      return {
      fillColor: 'RGB(' + color.red + ',' + color.green + ',' + color.blue + ')',
-     strokeWeight: 0,
+     strokeWeight: outLineweight,
      // draggable: true,
-     fillOpacity: color.opac
+     fillOpacity: color.opac,
+     // zIndex: zindex
+     visible: true
     };
+  });
+
+  this.googleMap.data.addListener('mouseover', (e) => {
+    console.log(e.feature);
+    e.feature.setProperty('state', 'hover');
+    const label_ = document.getElementById('data-label');
+    label_.innerHTML = e.feature.getProperty('name') + ': ' + this.countries[getCountryISO2(e.feature.m)];
+  });
+
+  this.googleMap.data.addListener('mouseout', (e) => {
+    console.log('hui');
+    e.feature.setProperty('state', 'ok');
   });
   }
 
