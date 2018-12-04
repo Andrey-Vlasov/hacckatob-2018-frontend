@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core';
 import { HybrisOccService } from './hybris-occ.service';
 import { LinearColorGradient } from './linear-color-gradient.service';
 import { Color } from '../models/color';
-import { GoogleCharts } from 'google-charts';
 
 const GOOGLE_MAP_API_URL = 'https://maps.googleapis.com/maps/api/js';
 // const GOOGLE_API_KEY = ''; // past the key here

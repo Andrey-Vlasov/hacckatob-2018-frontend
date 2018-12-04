@@ -9,12 +9,14 @@ import { HybrisOccService } from './services/hybris-occ.service';
 import { LinearColorGradient } from './services/linear-color-gradient.service';
 import { HttpClientModule } from '@angular/common/http';
 import { GoogleChartComponent } from './components/google-chart-component/google-chart.component';
+import { DonationListComponent } from './components/donation-list-component/donation-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     GoogleMapComponent,
-    GoogleChartComponent
+    GoogleChartComponent,
+    DonationListComponent
   ],
   imports: [
     BrowserModule,
