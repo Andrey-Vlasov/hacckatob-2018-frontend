@@ -7,7 +7,6 @@ import { Color } from '../models/color';
 
 const GOOGLE_MAP_API_URL = 'https://maps.googleapis.com/maps/api/js';
 // const GOOGLE_API_KEY = ''; // past the key here
-const GOOGLE_API_KEY = 'AIzaSyDGMNEuMeZWr5OZHJ8E8TQkugKCF-moVxo';
 const DEFAULT_SCALE = 2;
 const SELECTED_MARKER_SCALE = 16;
 const DEFAULT_LATITUDE = 30;
