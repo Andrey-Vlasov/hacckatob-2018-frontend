@@ -98,37 +98,28 @@ export class GoogleMapRendererService {
 
     let mapOpt: google.maps.MapTypeStyle[];
 
-    mapOpt = [{
-      featureType: 'administrative.country',
-      elementType: 'labels',
-      stylers: [{visibility: 'off'}]
-    },
-      {
-        featureType: 'water',
-      elementType: 'labels',
-      stylers: [{visibility: 'off'}]
-      },
-      {
-        featureType: 'landscape',
-      elementType: 'all',
-      stylers: [{visibility: 'off'}]
-      },
-      {
-        featureType: 'administrative.province',
-      elementType: 'all',
-      stylers: [{visibility: 'off'}]
-      }];
+    mapOpt = [
+    /* {
+       featureType: 'water',
+       elementType: 'labels',
+       stylers: [{visibility: 'on'}]
+     },
+     {featureType: 'landscape',
+    elementType: 'all',
+  stylers: [{visibility: 'off'}]}*/
+    ];
 
-    const mapProp = {
+    const mapProp: google.maps.MapOptions = {
       center: mapCenter,
       zoom: DEFAULT_SCALE,
       mapTypeId: google.maps.MapTypeId.ROADMAP,
       fullscreenControl: false,
-      draggable: false,
-      zoomControl: false,
+      // draggable: false,
+      // zoomControl: false,
       styles: mapOpt,
       streetViewControl: false,
-      mapTypeControl: false
+      mapTypeControl: false,
+      backgroundColor: 'black'
     };
 
     const label = document.createElement('div');
@@ -142,9 +133,13 @@ export class GoogleMapRendererService {
       this.googleMap.data.loadGeoJson(geoDataUrl);
     }
 
-    this.googleMap.data.add({geometry: new google.maps.Data.Polygon([[{lat: 0, lng: 0},
-      {lat: 40, lng: 40},
-      {lat: -40, lng: 40}]])});
+    const triangleCoords: google.maps.LatLngLiteral[] = [
+      {lat: 25.774, lng: -80.190},
+      {lat: 18.466, lng: -66.118},
+      {lat: 32.321, lng: -64.757}
+    ];
+
+    this.googleMap.data.add({geometry: new google.maps.Data.Polygon([triangleCoords])} );
 
     const countries = this.hybrisOccService.getDonationData();
 
@@ -173,7 +168,8 @@ export class GoogleMapRendererService {
         donation);
       } else {
         return {
-          visible: false
+          visible: true,
+          draggable: true
         };
       }
 
@@ -181,7 +177,6 @@ export class GoogleMapRendererService {
      return {
      fillColor: 'RGB(' + color.red + ',' + color.green + ',' + color.blue + ')',
      strokeWeight: outLineweight,
-     // draggable: true,
      fillOpacity: color.opac,
      // zIndex: zindex
      visible: true,
